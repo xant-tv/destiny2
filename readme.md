@@ -2,7 +2,7 @@
 Helpful scripts for Destiny 2 puzzle-solving.
 
 ## Zero Hour
-```python
+```bash
 # Execute with arc singe configuration.
 python zero_hour.py arc
 
