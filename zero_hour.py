@@ -1,3 +1,6 @@
+### COMPATIBILITY
+from __future__ import print_function
+
 ### IMPORTS
 import numpy as np
 import pandas as pd
@@ -59,7 +62,7 @@ slr_cfg = [
     '5-6-1-7-8-9', 
     '6-8-10-7-11-9'
 ]
-slr_pth = ('\n  ').join(['  '+'^    ','#    ','# ###','### #','    #',' ####',' #   ',' ^   '])
+slr_pth = ('\n  ').join(['  '+'^----','#    ','# ###','### #','    #',' ####',' #   ','-^---'])
 arc_cfg = [
     '10-11-3-2-8-7',
     '2-9-4-3-2-11',
@@ -111,7 +114,7 @@ arc_cfg = [
     '2-9-5-9-1-8',
     '8-3-4-9-5-9'
 ]
-arc_pth = ('\n  ').join(['  '+'^    ','#    ','# ###','# # #','# # #','### #','    #','    ^'])
+arc_pth = ('\n  ').join(['  '+'^----','#    ','# ###','# # #','# # #','### #','    #','----^'])
 voi_cfg = [
     '4-3-2-4-2-9',
     '2-4-1-6-3-10',
@@ -163,7 +166,7 @@ voi_cfg = [
     '4-3-2-11-4-7',
     '5-9-11-7-12-10'
 ]
-voi_pth = ('\n  ').join(['  '+'   ^ ','   # ','   ##','### #','# ###','##   ',' #   ',' ^   '])
+voi_pth = ('\n  ').join(['  '+'---^-','   # ','   ##','### #','# ###','##   ',' #   ','-^---'])
 cfg = {'arc': {'cfg': arc_cfg, 'path': arc_pth}, 'solar': {'cfg': slr_cfg, 'path': slr_pth}, 'void': {'cfg': voi_cfg, 'path': voi_pth}}
 rooms = ['Green', 'White', 'Yellow', 'Red', 'Cyan', 'Blue', 'Purple']
 nodes = [1, 2, 3, 4, 5, 6, 7]
@@ -180,8 +183,8 @@ args = parser.parse_args()
 active = cfg[args.element]
 
 # Print vault path.
-print '\nVAULT_PATH'
-print clr.Style.BRIGHT + active['path'] + clr.Style.RESET_ALL
+print('\nVAULT_PATH')
+print(clr.Style.BRIGHT + active['path'] + clr.Style.RESET_ALL)
 
 # Create encoding data structure.
 df = pd.DataFrame({'TERMINAL': terminals, 'COMBINATION': active['cfg']})
@@ -194,6 +197,9 @@ key = []
 # Exit condition.
 rct = 0
 lim = 3
+
+# Inherit frame.
+x = df
 
 # Provide utility until manual exit.
 while(rct < lim):
@@ -211,35 +217,40 @@ while(rct < lim):
     if not val:
         rct += 1
         if rct < lim:
-            print clr.Fore.CYAN + 'RESETTING' + clr.Style.RESET_ALL
-            idx = 0
+            print(clr.Fore.CYAN + clr.Style.BRIGHT + 'RESETTING' + clr.Style.RESET_ALL)
             key = []
+            idx = 0
+            x = df
             continue
         else:
-            print clr.Fore.MAGENTA + 'EXITING\n' + clr.Style.RESET_ALL
+            print(clr.Fore.MAGENTA + clr.Style.BRIGHT + 'EXITING\n' + clr.Style.RESET_ALL)
             continue
         
     # Store value in key.
-    idx += 1
     key.append(val)
-    rct = 0
     
     # Try to find the combination.
-    x = df.loc[df['COMBINATION'].str.contains('^' + ('-').join(key)), ['TERMINAL', 'COMBINATION']]
+    x = x.loc[x[idx].astype(str) == key[idx]]
+    
+    # Incremental.
+    idx += 1
+    rct = 0
     
     # Check result.
     if x.empty:
         # Reset to a try a new key.
-        print clr.Fore.RED + 'COMBINATION_NOT_FOUND' + clr.Style.RESET_ALL
-        idx = 0
+        print(clr.Fore.RED + clr.Style.BRIGHT + 'COMBINATION_NOT_FOUND' + clr.Style.RESET_ALL)
         key = []
+        idx = 0
+        x = df
     elif x.shape[0] == 1:
         # Print solution and ready new key.
-        print clr.Fore.GREEN + 'SOLUTION_FOUND' + clr.Style.RESET_ALL
-        print x
-        idx = 0
+        print(clr.Fore.GREEN + clr.Style.BRIGHT + 'SOLUTION_FOUND' + clr.Style.RESET_ALL)
+        print(x[['TERMINAL', 'COMBINATION', 'TIMES_USED']])
         key = []
+        idx = 0
+        x = df
     else:
         # Continue train.
-        print clr.Fore.YELLOW + 'POSSIBLE_KEYS' + clr.Style.RESET_ALL
-        print x
+        print(clr.Fore.YELLOW + clr.Style.BRIGHT + 'POSSIBLE_KEYS' + clr.Style.RESET_ALL)
+        print(x[['TERMINAL', 'COMBINATION', 'TIMES_USED']])
