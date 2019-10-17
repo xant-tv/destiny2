@@ -1,8 +1,14 @@
 # Destiny2
 Helpful scripts for Destiny 2 puzzle-solving.
 
-## Heroics
- - Zero Hour
+## Zero Hour
+```python
+# Execute for arc singe.
+python zero_hour.py arc
+
+# Allow replacement when picking combinations.
+python zero_hour.py void -r
+```
 
 ## Requirements
  - numpy
