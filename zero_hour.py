@@ -176,6 +176,7 @@ idx_map = {0:'T1L', 1:'T1R', 2:'T2L', 3:'T2R', 4:'T3L', 5:'T3R'}
 ### ARGPARSER
 parser = argparse.ArgumentParser(description='zero_hour.py element')
 parser.add_argument('element', choices=['arc', 'solar', 'void'], metavar='element', help='{arc|solar|void}')
+parser.add_argument('-r', dest='replacement', action='store_true')
 args = parser.parse_args()
 
 ### INITIALISE
@@ -189,6 +190,7 @@ print(clr.Style.BRIGHT + active['path'] + clr.Style.RESET_ALL)
 # Create encoding data structure.
 df = pd.DataFrame({'TERMINAL': terminals, 'COMBINATION': active['cfg']})
 df = df.merge(df['COMBINATION'].str.split(pat='-', expand=True).astype(int), how='inner', left_index=True, right_index=True)
+df['TIMES_USED'] = 0
 
 # Store search key.
 idx = 0
@@ -220,7 +222,7 @@ while(rct < lim):
             print(clr.Fore.CYAN + clr.Style.BRIGHT + 'RESETTING' + clr.Style.RESET_ALL)
             key = []
             idx = 0
-            x = df
+            x = df.loc[df['TIMES_USED'] == 0]
             continue
         else:
             print(clr.Fore.MAGENTA + clr.Style.BRIGHT + 'EXITING\n' + clr.Style.RESET_ALL)
@@ -247,9 +249,11 @@ while(rct < lim):
         # Print solution and ready new key.
         print(clr.Fore.GREEN + clr.Style.BRIGHT + 'SOLUTION_FOUND' + clr.Style.RESET_ALL)
         print(x[['TERMINAL', 'COMBINATION', 'TIMES_USED']])
+        if not args.replacement:
+            df.loc[x.index, 'TIMES_USED'] += 1
         key = []
         idx = 0
-        x = df
+        x = df.loc[df['TIMES_USED'] == 0]
     else:
         # Continue train.
         print(clr.Fore.YELLOW + clr.Style.BRIGHT + 'POSSIBLE_KEYS' + clr.Style.RESET_ALL)
