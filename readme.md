@@ -3,7 +3,7 @@ Helpful scripts for Destiny 2 puzzle-solving.
 
 ## Zero Hour
 ```python
-# Execute for arc singe.
+# Execute with arc singe configuration.
 python zero_hour.py arc
 
 # Allow replacement when picking combinations.
