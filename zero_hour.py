@@ -245,15 +245,45 @@ while(rct < lim):
         key = []
         idx = 0
         x = df
+        
+        # Force user to pause and read.
+        while(True):
+            pause = raw_input('')
+            if not pause:
+                break
+                
     elif x.shape[0] == 1:
         # Print solution and ready new key.
         print(clr.Fore.GREEN + clr.Style.BRIGHT + 'SOLUTION_FOUND' + clr.Style.RESET_ALL)
         print(x[['TERMINAL', 'COMBINATION', 'TIMES_USED']])
         if not args.replacement:
             df.loc[x.index, 'TIMES_USED'] += 1
+        
+        # Check if this solution knocked out any rooms.
+        if not args.replacement:
+            removed_room = None
+            for room in rooms:
+                if df.loc[(df['TERMINAL'].str.contains(room)) & (df['TIMES_USED'] == 0)].empty:
+                    print(clr.Fore.GREEN + clr.Style.BRIGHT + 'ROOM_COMPLETE' + clr.Style.RESET_ALL)
+                    removed_room = room
+                    rooms.remove(removed_room)
+                    break
+        
+        # Force user to pause and read.
+        while(True):
+            pause = raw_input('')
+            if not args.replacement and pause == 'UNDO':
+                df.loc[x.index, 'TIMES_USED'] -= 1
+                if removed_room:
+                    rooms.append(removed_room)
+                break
+            if not pause:
+                break
+        
         key = []
         idx = 0
         x = df.loc[df['TIMES_USED'] == 0]
+                
     else:
         # Continue train.
         print(clr.Fore.YELLOW + clr.Style.BRIGHT + 'POSSIBLE_KEYS' + clr.Style.RESET_ALL)
